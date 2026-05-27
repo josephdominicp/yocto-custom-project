@@ -1,0 +1,30 @@
+#!/bin/sh
+# Minimal runtime initialization script for rapid boot environments
+
+# Mount core virtual memory layers required by system utilities
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+
+echo "=========================================="
+echo "  Fast-Boot System Safely Initialized     "
+echo "=========================================="
+
+#!/bin/sh
+# Fast-boot optimized parallel init script (No Networking)
+
+# 1. Mount core filesystems sequentially (Critical for system stability)
+/etc/init.d/sysfs.sh start
+/etc/init.d/checkroot.sh start
+/etc/init.d/mountall.sh start
+
+# 2. Launch remaining independent services in parallel
+/etc/init.d/hostname.sh start &
+/etc/init.d/syslog start &
+
+# If urandom exists, background it because generating entropy can block the boot
+if [ -f /etc/init.d/urandom ]; then
+    /etc/init.d/urandom start &
+fi
+
+# 3. Wait for all background tasks to finish before launching the user space/login
+wait

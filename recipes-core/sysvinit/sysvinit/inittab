@@ -1,0 +1,5 @@
+# /etc/inittab: Ultra-minimal initialization table for rapid boot
+::sysinit:/etc/init.d/rcS
+::askfirst:-/bin/sh
+::restart:/sbin/init
+::ctrlaltdel:/sbin/reboot
